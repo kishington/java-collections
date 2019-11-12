@@ -6,7 +6,7 @@ import java.util.stream.Collectors;
 
 public class FrequencyCounter {
 
-    private Map<String, Map<Character, Integer>> cache = new HashMap<>();
+    Map<String, Map<Character, Integer>> cache = new HashMap<>();
 
     public void showFrequencies(String input) {
         Map<Character, Integer> frequencies = getFrequencies(input);
@@ -16,11 +16,12 @@ public class FrequencyCounter {
     Map<Character, Integer> getFrequencies(String input) {
 
         Map<Character, Integer> frequencies;
-        if (cache != null && cache.containsKey(input)) {
+        if (cache.containsKey(input)) {
             frequencies = cache.get(input);
         } else {
             frequencies = input.chars().boxed()
                     .collect(Collectors.toMap(k -> Character.valueOf((char) k.intValue()), v -> 1, Integer::sum));
+            //input.chars().boxed().forEach(ch -> frequencies.merge((Character) ch, 1, (prev, one) -> prev  + one));
             cache.put(input, frequencies);
         }
         return frequencies;
