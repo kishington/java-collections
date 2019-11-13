@@ -1,157 +1,136 @@
 package ua.com.foxminded.charfrequency.counters;
 
+import static org.junit.Assert.assertTrue;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
+
 public class FrequencyCounterTest {
+    private static FrequencyCounter freqCounter;
     
+    @BeforeAll
+    public static void initialise() {
+        freqCounter = new FrequencyCounter();
+    }
+    
+ 
     @Test
     void testCache() {
-        String[] inputs = {"kukushka", "tort", "tort", "nosok", "nosok", "nout", "ryba", "nout"};
+        String[] inputs = { "kukushka", "tort", "tort", "nosok", "nosok", "nout", "ryba", "nout" };
+        String[] expectedOutputs = { "\"k\" - 3\n" + "\"u\" - 2\n" + "\"s\" - 1\n" + "\"h\" - 1\n" + "\"a\" - 1\n",
+            "\"t\" - 2\n" + "\"o\" - 1\n" + "\"r\" - 1\n", 
+            "\"t\" - 2\n" + "\"o\" - 1\n" + "\"r\" - 1\n",
+            "\"n\" - 1\n" + "\"o\" - 2\n" + "\"s\" - 1\n" + "\"k\" - 1\n",
+            "\"n\" - 1\n" + "\"o\" - 2\n" + "\"s\" - 1\n" + "\"k\" - 1\n",
+            "\"n\" - 1\n" + "\"o\" - 1\n" + "\"u\" - 1\n" + "\"t\" - 1\n",
+            "\"r\" - 1\n" + "\"y\" - 1\n" + "\"b\" - 1\n" + "\"a\" - 1\n",
+            "\"n\" - 1\n" + "\"o\" - 1\n" + "\"u\" - 1\n" + "\"t\" - 1\n" };
         
-        FrequencyCounter freqCounter = new FrequencyCounter();
         FrequencyCounter testFreqCounter = new FrequencyCounter();
-        
-        Map<String, Map<Character, Integer>> expectedCache = new HashMap<>();
-        //Map<String, Map<Character, Integer>> actualCache = testFreqCounter.cache;
-        
+        Map<String, String> expectedCache = new LinkedHashMap<>();
+
         assertEquals(testFreqCounter.cache.size(), 0);
-        
-        for(int i = 0; i < inputs.length; i++) {
+
+        for (int i = 0; i < inputs.length; i++) {
             testFreqCounter.getFrequencies(inputs[i]);
-            Map<String, Map<Character, Integer>> actualCache = testFreqCounter.cache;
-            expectedCache.put(inputs[i], freqCounter.getFrequencies(inputs[i]));
-            
+            Map<String, String> actualCache = testFreqCounter.cache;
+            expectedCache.put(inputs[i], expectedOutputs[i]);
+
             assertTrue(actualCache.keySet().containsAll(expectedCache.keySet()));
-            expectedCache.keySet().stream().forEach((key) -> assertEquals(expectedCache.get(key), actualCache.get(key)));
+            expectedCache.keySet().stream()
+                    .forEach((key) -> assertEquals(expectedCache.get(key), actualCache.get(key)));
         }
     }
 
     @Test
     void test_getFrequencies_inputEmptyString() {
         String input = "";
-        
-        FrequencyCounter freqCounter = new FrequencyCounter();
-        Map<Character, Integer> actualMap = freqCounter.getFrequencies(input);
-        Map<Character, Integer> expectedMap =  new HashMap<>();
-        
-        assertTrue(actualMap.keySet().containsAll(expectedMap.keySet()));
-        expectedMap.keySet().stream().forEach((key) -> assertEquals(expectedMap.get(key), actualMap.get(key)));
+        String actualFreqs = freqCounter.getFrequencies(input);
+        String expectedFreqs = "";
+        assertEquals(expectedFreqs, actualFreqs);
     }
-    
+
     @Test
     void test_getFrequencies_inputJustSpaces() {
         String input = "         ";
-        
-        FrequencyCounter freqCounter = new FrequencyCounter();
-        Map<Character, Integer> actualMap = freqCounter.getFrequencies(input);
-        
-        Map<Character, Integer> expectedMap =  new HashMap<>();
-        expectedMap.put(' ', 9);
-        
-        assertTrue(actualMap.keySet().containsAll(expectedMap.keySet()));
-        expectedMap.keySet().stream().forEach((key) -> assertEquals(expectedMap.get(key), actualMap.get(key)));
+        String actualFreqs = freqCounter.getFrequencies(input);
+        String expectedFreqs = "\" \" - 9\n";
+        assertEquals(expectedFreqs, actualFreqs);
     }
-    
+
     @Test
     void test_getFrequencies_inputJustNumbers() {
         String input = "345662111";
-        
-        FrequencyCounter freqCounter = new FrequencyCounter();
-        Map<Character, Integer> actualMap = freqCounter.getFrequencies(input);
-        
-        Map<Character, Integer> expectedMap =  new HashMap<>();
-        expectedMap.put('3', 1);
-        expectedMap.put('4', 1);
-        expectedMap.put('5', 1);
-        expectedMap.put('6', 2);
-        expectedMap.put('2', 1); 
-        expectedMap.put('1', 3);
-        
-        assertTrue(actualMap.keySet().containsAll(expectedMap.keySet()));
-        expectedMap.keySet().stream().forEach((key) -> assertEquals(expectedMap.get(key), actualMap.get(key)));
+        String actualFreqs = freqCounter.getFrequencies(input);
+        String expectedFreqs = 
+                "\"3\" - 1\n" + 
+                "\"4\" - 1\n" + 
+                "\"5\" - 1\n" + 
+                "\"6\" - 2\n" + 
+                "\"2\" - 1\n" + 
+                "\"1\" - 3\n";
+        assertEquals(expectedFreqs, actualFreqs);
     }
     
     @Test
     void test_getFrequencies_inputSameNumber() {
         String input = "1111111";
-        
-        FrequencyCounter freqCounter = new FrequencyCounter();
-        Map<Character, Integer> actualMap = freqCounter.getFrequencies(input);
-        
-        Map<Character, Integer> expectedMap =  new HashMap<>(); 
-        expectedMap.put('1', 7);
-        
-        assertTrue(actualMap.keySet().containsAll(expectedMap.keySet()));
-        expectedMap.keySet().stream().forEach((key) -> assertEquals(expectedMap.get(key), actualMap.get(key)));
+        String actualFreqs = freqCounter.getFrequencies(input);
+        String expectedFreqs = "\"1\" - 7\n";
+        assertEquals(expectedFreqs, actualFreqs);
     }
     
     @Test
     void test_getFrequencies_inputJustLetters() {
         String input = "karandash";
-        
-        FrequencyCounter freqCounter = new FrequencyCounter();
-        Map<Character, Integer> actualMap = freqCounter.getFrequencies(input);
-        
-        Map<Character, Integer> expectedMap =  new HashMap<>();
-        expectedMap.put('k', 1);
-        expectedMap.put('a', 3);
-        expectedMap.put('r', 1);
-        expectedMap.put('n', 1);
-        expectedMap.put('d', 1); 
-        expectedMap.put('s', 1);
-        expectedMap.put('h', 1);
-        
-        assertTrue(actualMap.keySet().containsAll(expectedMap.keySet()));
-        expectedMap.keySet().stream().forEach((key) -> assertEquals(expectedMap.get(key), actualMap.get(key)));
+        String actualFreqs = freqCounter.getFrequencies(input);
+        String expectedFreqs = 
+                "\"k\" - 1\n" + 
+                "\"a\" - 3\n" + 
+                "\"r\" - 1\n" + 
+                "\"n\" - 1\n" + 
+                "\"d\" - 1\n" + 
+                "\"s\" - 1\n" + 
+                "\"h\" - 1\n";
+        assertEquals(expectedFreqs, actualFreqs);
     }
     
     @Test
     void test_getFrequencies_inputWithSpaces() {
         String input = "i td i tp";
-        
-        FrequencyCounter freqCounter = new FrequencyCounter();
-        Map<Character, Integer> actualMap = freqCounter.getFrequencies(input);
-        
-        Map<Character, Integer> expectedMap =  new HashMap<>();
-        expectedMap.put('i', 2);
-        expectedMap.put(' ', 3);
-        expectedMap.put('t', 2);
-        expectedMap.put('d', 1);
-        expectedMap.put('p', 1); 
-        
-        assertTrue(actualMap.keySet().containsAll(expectedMap.keySet()));
-        expectedMap.keySet().stream().forEach((key) -> assertEquals(expectedMap.get(key), actualMap.get(key)));
+        String actualFreqs = freqCounter.getFrequencies(input);
+        String expectedFreqs = 
+                "\"i\" - 2\n" + 
+                "\" \" - 3\n" + 
+                "\"t\" - 2\n" + 
+                "\"d\" - 1\n" + 
+                "\"p\" - 1\n";
+        assertEquals(expectedFreqs, actualFreqs);
     }
     
     @Test
     void test_getFrequencies_inputWithNonLetters() {
         String input = "#%&*&&^-k *087-ku!";
-        
-        FrequencyCounter freqCounter = new FrequencyCounter();
-        Map<Character, Integer> actualMap = freqCounter.getFrequencies(input);
-        
-        Map<Character, Integer> expectedMap =  new HashMap<>();
-        expectedMap.put('#', 1);
-        expectedMap.put('%', 1);
-        expectedMap.put('&', 3);
-        expectedMap.put('*', 2);
-        expectedMap.put('^', 1);
-        expectedMap.put('-', 2);
-        expectedMap.put('k', 2); 
-        expectedMap.put(' ', 1);
-        expectedMap.put('0', 1); 
-        expectedMap.put('8', 1);
-        expectedMap.put('7', 1);
-        expectedMap.put('u', 1);
-        expectedMap.put('!', 1); 
-        
-        assertTrue(actualMap.keySet().containsAll(expectedMap.keySet()));
-        expectedMap.keySet().stream().forEach((key) -> assertEquals(expectedMap.get(key), actualMap.get(key)));
+        String actualFreqs = freqCounter.getFrequencies(input);
+        String expectedFreqs = 
+                "\"#\" - 1\n" + 
+                "\"%\" - 1\n" + 
+                "\"&\" - 3\n" + 
+                "\"*\" - 2\n" + 
+                "\"^\" - 1\n" + 
+                "\"-\" - 2\n" + 
+                "\"k\" - 2\n" + 
+                "\" \" - 1\n" + 
+                "\"0\" - 1\n" + 
+                "\"8\" - 1\n" + 
+                "\"7\" - 1\n" + 
+                "\"u\" - 1\n" + 
+                "\"!\" - 1\n";
+        assertEquals(expectedFreqs, actualFreqs);
     }
 }
