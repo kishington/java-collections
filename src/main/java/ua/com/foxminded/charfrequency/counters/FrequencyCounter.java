@@ -19,10 +19,11 @@ public class FrequencyCounter {
                  .collect(toList())
                  .forEach(c -> frequencies.merge(c, 1, Integer::sum));
             
-            String freqsToCache = frequencies.keySet()
-                                             .stream()
-                                             .map(key -> "\"" + key + "\" - " + frequencies.get(key) + "\n")
-                                             .collect(joining());
+            String freqsToCache = 
+                    frequencies.keySet()
+                               .stream()
+                               .map(key -> "\"" + key + "\" - " + frequencies.get(key) + "\n")
+                               .collect(joining());
             return freqsToCache;
         });
         return result;
