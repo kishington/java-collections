@@ -15,14 +15,14 @@ public class FrequencyCounter {
         String result = cache.computeIfAbsent(input, k -> {
             Map<Character, Integer> frequencies = new LinkedHashMap<>();
             input.chars()
-            	 .mapToObj(c -> (char) c)
-            	 .collect(toList())
-            	 .forEach(c -> frequencies.merge(c, 1, Integer::sum));
+                 .mapToObj(c -> (char) c)
+                 .collect(toList())
+                 .forEach(c -> frequencies.merge(c, 1, Integer::sum));
             
             String freqsToCache = frequencies.keySet()
-            								 .stream()
-            								 .map(key -> "\"" + key + "\" - " + frequencies.get(key) + "\n")
-            								 .collect(joining());
+                                             .stream()
+                                             .map(key -> "\"" + key + "\" - " + frequencies.get(key) + "\n")
+                                             .collect(joining());
             return freqsToCache;
         });
         return result;
