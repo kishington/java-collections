@@ -3,8 +3,8 @@ package ua.com.foxminded.charfrequency.counters;
 import static org.junit.Assert.assertTrue;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-import java.util.LinkedHashMap;
-import java.util.Map;
+import java.time.Duration;
+import java.time.Instant;
 
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
@@ -17,34 +17,35 @@ public class FrequencyCounterTest {
     public static void initialise() {
         freqCounter = new FrequencyCounter();
     }
+   
     
- 
     @Test
     void testCache() {
-        String[] inputs = { "kukushka", "tort", "tort", "nosok", "nosok", "nout", "ryba", "nout" };
-        String[] expectedOutputs = { "\"k\" - 3\n" + "\"u\" - 2\n" + "\"s\" - 1\n" + "\"h\" - 1\n" + "\"a\" - 1\n",
-            "\"t\" - 2\n" + "\"o\" - 1\n" + "\"r\" - 1\n", 
-            "\"t\" - 2\n" + "\"o\" - 1\n" + "\"r\" - 1\n",
-            "\"n\" - 1\n" + "\"o\" - 2\n" + "\"s\" - 1\n" + "\"k\" - 1\n",
-            "\"n\" - 1\n" + "\"o\" - 2\n" + "\"s\" - 1\n" + "\"k\" - 1\n",
-            "\"n\" - 1\n" + "\"o\" - 1\n" + "\"u\" - 1\n" + "\"t\" - 1\n",
-            "\"r\" - 1\n" + "\"y\" - 1\n" + "\"b\" - 1\n" + "\"a\" - 1\n",
-            "\"n\" - 1\n" + "\"o\" - 1\n" + "\"u\" - 1\n" + "\"t\" - 1\n" };
-        
         FrequencyCounter testFreqCounter = new FrequencyCounter();
-        Map<String, String> expectedCache = new LinkedHashMap<>();
+        String veryLongString = "a;jg;dfurqrg;askjd;sgq;weruqwe;wdfjs sdf adfjas;dfj kja;jfj a;;ajfuigeheprg7"
+                + "l;llj;lLJ:JKJdfsfasdfgasdfasdfasdfehrujreir634:JK:JJ;j;jfjdf;asfwuefoiu092039u02eji;jfsadf"
+                + "a;jfka;dfkjas;dfjas;dfdjs;jdf;asjdfk;a;fasfjk;dsfgsdfgdsfgsdfgsdfgsdfgsdfsdgsfgsfhtuqwueps"
+                + ";asfhas;dfu;adf;asdf;as;dfjwepqwurfqwifj;askjfupgupwgwquradfasdfwerqwghfdsfhsdrewqedfsawur"
+                + ";afsadfsdhdshhhhhhhhhhufeuwroqruqw;rq;refjsa;dasfewqrqewrrrrrrrrrrwqqqqqqqqdddddddddddfja;"
+                + "8432p3 2223r wera9fasd;fujsvj;j;U)*UJOidj2#@#######@sd--98908945343243324343dfadaaaf*()#@E"
+                + "a;jg;dfurqrg;askjd;sgq;weruqwe;wdfjs sdf adfjas;dfj kja;jfj a;;ajfuigehepruyllllllllllllg7"
+                + "l;llj;lLJ:JKJdfsfasdfgasdfasdfasdfehrujreir634:JK:JJ;j;jfjdf;asfwuefoiu092039u02eji;jfsadf"
+                + "a;jfka;dfkjas;dfjas;dfdjs;jdf;asjdfk;a;fasfjk;dsfgsdfgdsfgsdfgsdfgsdfgsdfsdgsfgsfhtuqwueps"
+                + ";asfhas;dfu;adf;asdf;as;dfjwepqwurfqwifj;askjfupgupwgwquradfasdfwerqwghfdsfhsdrewqedfsawur"
+                + ";afsadfsdhdshhhhhhhhhhufeuwroqruqw;rq;refjsa;dasfewqrqewrrrrrrrrrrwqqqqqqqqdddddddddddfja;"
+                + "8432p3 2223r wera9fasd;fujsvj;j;U)*UJOidj2#@#######@sd--98908945343243324343dfadaaaf*()#@E";
 
-        assertEquals(testFreqCounter.cache.size(), 0);
+        Instant momentBeforeExecution = Instant.now();
+        testFreqCounter.getFrequencies(veryLongString);
+        Instant momentAfterExecution = Instant.now();
+        long calculationTime = Duration.between(momentBeforeExecution, momentAfterExecution).toNanos();
 
-        for (int i = 0; i < inputs.length; i++) {
-            testFreqCounter.getFrequencies(inputs[i]);
-            Map<String, String> actualCache = testFreqCounter.cache;
-            expectedCache.put(inputs[i], expectedOutputs[i]);
+        momentBeforeExecution = Instant.now();
+        testFreqCounter.getFrequencies(veryLongString);
+        momentAfterExecution = Instant.now();
+        long readingFromCacheTime = Duration.between(momentBeforeExecution, momentAfterExecution).toNanos();
 
-            assertTrue(actualCache.keySet().containsAll(expectedCache.keySet()));
-            expectedCache.keySet().stream()
-                    .forEach((key) -> assertEquals(expectedCache.get(key), actualCache.get(key)));
-        }
+        assertTrue(calculationTime >= readingFromCacheTime);
     }
 
     @Test
